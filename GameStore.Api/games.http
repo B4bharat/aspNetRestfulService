@@ -1,0 +1,32 @@
+GET http://localhost:5151
+
+### Get All Games
+GET http://localhost:5151/games
+
+### Get Game By Id
+GET http://localhost:5151/games/4
+
+### Create Game
+POST http://localhost:5151/games
+Content-Type: application/json
+
+{
+  "name": "Call of Duty: Horizon",
+  "genre": "Action",
+  "price": 39.99,
+  "releaseDate": "2023-01-01"
+}
+
+### Update Game
+PUT http://localhost:5151/games/1
+Content-Type: application/json
+
+{
+  "name": "Call of Duty: Modern Warfare",
+  "genre": "Action",
+  "price": 29.99,
+  "releaseDate": "2023-01-01"
+}
+
+### Delete Game
+DELETE http://localhost:5151/games/1
