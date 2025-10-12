@@ -1,4 +1,6 @@
+using GameStore.Api.Data;
 using GameStore.Api.Dtos;
+using GameStore.Api.Entities;
 
 namespace GameStore.Api.Endpoints
 {
@@ -26,17 +28,29 @@ namespace GameStore.Api.Endpoints
                 return game is not null ? Results.Ok(game) : Results.NotFound();
             });
 
-            gamesGroup.MapPost("/", (CreateGameDto createGameDto) =>
+            gamesGroup.MapPost("/", (CreateGameDto createGameDto, GameStoreContext dbContext) =>
             {
-                var newGame = new GameDto(
-                    Id: games.Count + 1,
-                    Name: createGameDto.Name,
-                    Genre: createGameDto.Genre,
-                    Price: createGameDto.Price,
-                    ReleaseDate: createGameDto.ReleaseDate
+                Game game = new Game
+                {
+                    Name = createGameDto.Name,
+                    Genre = dbContext.Genres.Find(createGameDto.GenreId),
+                    GenreId = createGameDto.GenreId,
+                    Price = createGameDto.Price,
+                    ReleaseDate = createGameDto.ReleaseDate
+                };
+
+                dbContext.Games.Add(game);
+                dbContext.SaveChanges();
+
+                GameDto gameDto = new GameDto(
+                    game.Id,
+                    game.Name,
+                    game.Genre!.Name,
+                    game.Price,
+                    game.ReleaseDate
                 );
-                games.Add(newGame);
-                return Results.Created($"/games/{newGame.Id}", newGame);
+
+                return Results.Created($"/games/{game.Id}", gameDto);
             });
 
             gamesGroup.MapPut("/{id:int}", (int id, UpdateGameDto updateGameDto) =>

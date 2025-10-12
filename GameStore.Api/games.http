@@ -11,10 +11,10 @@ POST http://localhost:5151/games
 Content-Type: application/json
 
 {
-  "name": "Call of Duty: Horizon",
-  "genre": "Action",
-  "price": 39.99,
-  "releaseDate": "2023-01-01"
+  "name": "The Legend of Zelda: Breath of the Wild",
+  "genreId": 2,
+  "price": 29.99,
+  "releaseDate": "2024-01-01"
 }
 
 ### Update Game
