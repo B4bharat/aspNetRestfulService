@@ -8,12 +8,23 @@ public static class GameMapping
   // Extension method to map CreateGameDto to Game entity
   public static Game ToEntity(this CreateGameDto dto)
   {
-      return new Game
-      {
-          Name = dto.Name,
-          GenreId = dto.GenreId,
-          Price = dto.Price,
-          ReleaseDate = dto.ReleaseDate
-      };
+    return new Game
+    {
+      Name = dto.Name,
+      GenreId = dto.GenreId,
+      Price = dto.Price,
+      ReleaseDate = dto.ReleaseDate
+    };
+  }
+
+  public static GameDto ToDto(this Game game)
+  {
+    return new GameDto(
+      game.Id,
+      game.Name,
+      game.Genre!.Name,
+      game.Price,
+      game.ReleaseDate
+    );
   }
 }
