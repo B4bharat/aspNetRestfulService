@@ -7,8 +7,53 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />
     <PackageReference Include="MinimalApis.Extensions" Version="0.11.0" />
   </ItemGroup>
 
 </Project>
+
+<!--
+Notes:
+The **Microsoft.EntityFrameworkCore.Design** NuGet package contains design-time components for Entity Framework Core. Here's what it helps achieve:
+
+## Primary Purpose
+
+It enables **EF Core tooling and design-time operations** in your project, specifically:
+
+### 1. **Migrations**
+- Creating, applying, and managing database migrations
+- Generating migration scripts
+- Updating your database schema based on model changes
+
+### 2. **Scaffolding (Reverse Engineering)**
+- Generating entity classes and DbContext from an existing database
+- The `Scaffold-DbContext` command relies on this package
+
+### 3. **Design-Time DbContext Creation**
+- Provides the infrastructure for tools to create instances of your DbContext at design time (not runtime)
+- Supports `IDesignTimeDbContextFactory<T>` implementations
+
+## When You Need It
+
+You typically need this package in:
+- **Development/startup projects** where you run EF Core commands
+- Projects where you execute:
+  - `dotnet ef migrations add`
+  - `dotnet ef database update`
+  - `dotnet ef dbcontext scaffold`
+  - Package Manager Console commands like `Add-Migration`, `Update-Database`
+
+## When You DON'T Need It
+
+- **Class library projects** that only contain your models and DbContext (unless they're your startup project)
+- **Production/runtime** - this package is not required for your application to run; it's only needed at development time
+
+## Important Note
+
+This package is typically marked with `<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>` and `<PrivateAssets>all</PrivateAssets>` to indicate it's a development dependency only and won't be deployed with your application.
+ -->

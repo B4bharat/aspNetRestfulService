@@ -1,0 +1,6 @@
+obj/
+bin/
+GameStore.db
+GameStore.db-shm
+GameStore.db-wal
+.vs/
