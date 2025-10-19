@@ -9,15 +9,6 @@ namespace GameStore.Api.Endpoints
     public static class GamesEndpoints
     {
 
-        private static readonly List<GameSummaryDto> games = new List<GameSummaryDto>
-        {
-            new GameSummaryDto(1, "The Legend of Zelda: Breath of the Wild", "1", 59.99m, new DateOnly(2017, 3, 3)),
-            new GameSummaryDto(2, "Super Mario Odyssey", "2", 59.99m, new DateOnly(2017, 10, 27)),
-            new GameSummaryDto(3, "Metroid Dread", "1", 59.99m, new DateOnly(2021, 10, 8)),
-            new GameSummaryDto(4, "Splatoon 3", "3", 59.99m, new DateOnly(2022, 9, 9)),
-            new GameSummaryDto(5, "Animal Crossing: New Horizons", "4", 59.99m, new DateOnly(2020, 3, 20))
-        };
-
         public static RouteGroupBuilder MapGamesEndpoints(this WebApplication app)
         {
             var gamesGroup = app.MapGroup("games").WithParameterValidation();
@@ -27,6 +18,7 @@ namespace GameStore.Api.Endpoints
                 var gameSummaries = dbContext.Games
                     .Include(game => game.Genre)
                     .Select(game => game.ToGameSummaryDto())
+                    .AsNoTracking()
                     .ToList();
                 return Results.Ok(gameSummaries);
             });
@@ -60,12 +52,10 @@ namespace GameStore.Api.Endpoints
                 return Results.Ok();
             });
 
-            gamesGroup.MapDelete("/{id:int}", (int id) =>
+            gamesGroup.MapDelete("/{id:int}", (int id, GameStoreContext dbContext) =>
             {
-                var game = games.FirstOrDefault(g => g.Id == id);
-                if (game is null) return Results.NotFound();
+                dbContext.Games.Where(games => games.Id == id).ExecuteDelete();
 
-                games.Remove(game);
                 return Results.NoContent();
             });
 
