@@ -1,4 +1,5 @@
 using GameStore.Api.Data;
+using Microsoft.EntityFrameworkCore;
 using GameStore.Api.Dtos;
 using GameStore.Api.Entities;
 using GameStore.Api.Mapping;
@@ -21,7 +22,14 @@ namespace GameStore.Api.Endpoints
         {
             var gamesGroup = app.MapGroup("games").WithParameterValidation();
 
-            gamesGroup.MapGet("/", () => games);
+            gamesGroup.MapGet("/", (GameStoreContext dbContext) =>
+            {
+                var gameSummaries = dbContext.Games
+                    .Include(game => game.Genre)
+                    .Select(game => game.ToGameSummaryDto())
+                    .ToList();
+                return Results.Ok(gameSummaries);
+            });
 
             gamesGroup.MapGet("/{id:int}", (int id, GameStoreContext dbContext) =>
             {
@@ -41,23 +49,15 @@ namespace GameStore.Api.Endpoints
                 return Results.Created($"/games/{game.Id}", gameDto);
             });
 
-            gamesGroup.MapPut("/{id:int}", (int id, UpdateGameDto updateGameDto) =>
+            gamesGroup.MapPut("/{id:int}", (int id, UpdateGameDto updatedGame, GameStoreContext dbContext) =>
             {
-                var game = games.FirstOrDefault(g => g.Id == id);
-                if (game is null) return Results.NotFound();
+                var existingGame = dbContext.Games.Find(id);
+                if (existingGame is null) return Results.NotFound();
 
-                var updatedGame = new GameSummaryDto(
-                    Id: game.Id,
-                    Name: updateGameDto.Name,
-                    Genre: updateGameDto.Genre,
-                    Price: updateGameDto.Price,
-                    ReleaseDate: updateGameDto.ReleaseDate
-                );
+                dbContext.Entry(existingGame).CurrentValues.SetValues(updatedGame.ToEntity(id));
+                dbContext.SaveChanges();
 
-                games.Remove(game);
-                games.Add(updatedGame);
-
-                return Results.Ok(updatedGame);
+                return Results.Ok();
             });
 
             gamesGroup.MapDelete("/{id:int}", (int id) =>
